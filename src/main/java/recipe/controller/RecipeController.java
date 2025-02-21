@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import recipe.entity.Recipe;
 import recipe.entity.User;
-import recipe.service.RecipeService;
+import recipe.service.RecipeServiceImpl;
 import recipe.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/recipes")
 public class RecipeController {
 	@Autowired
-	private RecipeService recipeService;
+	private RecipeServiceImpl recipeService;
 	
 	@Autowired
 	private UserServiceImpl userService;
