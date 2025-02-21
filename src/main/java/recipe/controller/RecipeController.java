@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import recipe.entity.Recipe;
 import recipe.entity.User;
 import recipe.service.RecipeService;
-import recipe.service.UserService;
+import recipe.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -26,7 +26,7 @@ public class RecipeController {
 	private RecipeService recipeService;
 	
 	@Autowired
-	private UserService userService;
+	private UserServiceImpl userService;
 
 	@PostMapping
     public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
