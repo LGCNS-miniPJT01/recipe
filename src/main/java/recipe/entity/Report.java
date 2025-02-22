@@ -28,9 +28,6 @@ public class Report {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // 신고된 사용자
-
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe; // 신고된 레시피
 
