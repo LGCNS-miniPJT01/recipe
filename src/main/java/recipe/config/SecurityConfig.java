@@ -26,7 +26,11 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger-resources/**", 
                     "/webjars/**",
-                    "/api/users/register"  // 나중에 비로그인 사용자 기능을 추가하려면 아래 url 추가 
+                    // 나중에 비로그인 사용자 기능을 추가하려면 아래 url 추가 
+                    "/api/users/register",  // 회원가입
+                    "/api/users/login", // 로그인
+                    "/api/user/list"
+                    
                 ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
                 .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
             )
