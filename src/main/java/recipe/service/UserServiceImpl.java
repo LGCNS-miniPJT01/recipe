@@ -5,10 +5,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import recipe.dto.LoginRequestDto;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 import recipe.entity.UserRole;
 import recipe.repository.UserRepository;
+import recipe.util.JWTUtil;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -18,6 +20,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
     private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+    private JWTUtil jwtUtil;
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -58,4 +63,21 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
 		
 	}
+
+	// 로그인 기능
+	@Override
+	public String login(LoginRequestDto loginRequestDto) {
+		
+		if(loginRequestDto.getEmail() == null || loginRequestDto.getEmail().isBlank()) {
+			throw new IllegalArgumentException("이메일을 입력해주세요.");
+		}
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return jwtUtil.createJwt(user.getEmail(), "USER", 3600000L); // 1시간짜리 JWT 생성
+    }
 }
