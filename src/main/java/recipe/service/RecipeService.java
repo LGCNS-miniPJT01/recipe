@@ -9,7 +9,7 @@ import java.util.List;
 public interface RecipeService {
 
 	// 레시피 생성
-	Recipe saveRecipe(Recipe newRecipe, User user, List<RecipeSteps> steps);
+	Recipe saveRecipe(Recipe newRecipe, User user);
 
 	// 레시피 수정
 	Recipe updateRecipe(Long recipeId, Recipe updatedRecipe, User user, List<RecipeSteps> steps);

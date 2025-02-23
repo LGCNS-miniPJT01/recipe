@@ -24,8 +24,7 @@ public class RecipeServiceImpl implements RecipeService {
 
 	@Override
 	@Transactional
-	public Recipe saveRecipe(Recipe newRecipe, User user, List<RecipeSteps> steps) {
-
+	public Recipe saveRecipe(Recipe newRecipe, User user) {
 		if (user == null) {
 			throw new RuntimeException("로그인한 사용자 정보가 필요합니다.");
 		}
@@ -34,31 +33,29 @@ public class RecipeServiceImpl implements RecipeService {
 			throw new IllegalArgumentException("레시피 제목은 필수 입력 항목입니다.");
 		}
 
-		newRecipe.setUser(user);  // 로그인한 사용자 설정
+		List<RecipeSteps> steps = newRecipe.getRecipeSteps(); // JSON의 recipeSteps 사용
+
+		if (steps == null || steps.isEmpty()) {
+			throw new IllegalArgumentException("레시피 단계가 필요합니다.");
+		}
+
+		newRecipe.setUser(user);
 		newRecipe.setCreatedAt(new Date());
 		newRecipe.setUpdatedAt(new Date());
 		newRecipe.setDeletedYn(false);
 
-		// 레시피 저장
-		Recipe savedRecipe = recipeRepository.save(newRecipe);
-
-		// steps가 null인 경우 예외 처리
-		if (steps == null) {
-			throw new IllegalArgumentException("레시피 단계가 필요합니다.");
-		}
-
-		// 레시피 스텝 저장
+		// 레시피와 스텝 연결
 		for (RecipeSteps step : steps) {
-			step.setRecipe(savedRecipe); // 레시피와 스텝 연결
-			recipeStepRepository.save(step);
+			step.setRecipe(newRecipe);
 		}
 
-		return savedRecipe;
+		// 레시피 저장 (cascade로 steps도 저장됨)
+		return recipeRepository.save(newRecipe);
 	}
 
-
-	// 레시피 수정
+	//수정
 	@Override
+	@Transactional
 	public Recipe updateRecipe(Long recipeId, Recipe updatedRecipe, User user, List<RecipeSteps> steps) {
 		Optional<Recipe> optionalRecipe = recipeRepository.findById(recipeId);
 
@@ -88,23 +85,22 @@ public class RecipeServiceImpl implements RecipeService {
 		recipe.setImageLarge(updatedRecipe.getImageLarge());
 		recipe.setIngredients(updatedRecipe.getIngredients());
 		recipe.setTip(updatedRecipe.getTip());
-
 		recipe.setUpdatedAt(new Date());
 
-		// 기존 레시피 스텝 삭제 (새로운 스텝만 남기기)
 		recipeStepRepository.deleteAllByRecipe(recipe);
 
-		// 새 스텝들 저장
-		int stepNumber = 1;  // 스텝 번호 초기화
-		for (RecipeSteps step : steps) {
-			step.setRecipe(recipe); // 레시피와 스텝 연결
-			step.setStepNumber(stepNumber);  // 스텝 번호 설정
-			recipeStepRepository.save(step);
-			stepNumber++;  // 스텝 번호 증가
+		if (steps != null && !steps.isEmpty()) {
+			int stepNumber = 1;
+			for (RecipeSteps step : steps) {
+				step.setRecipe(recipe);
+				step.setStepNumber(stepNumber++);
+				recipeStepRepository.save(step);
+			}
 		}
 
 		return recipeRepository.save(recipe);
 	}
+
 
 	// 삭제
 	@Override

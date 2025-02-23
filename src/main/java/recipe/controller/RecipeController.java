@@ -1,16 +1,22 @@
 package recipe.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import recipe.dto.RecipeWithStepsDto;
 import recipe.entity.Recipe;
+import recipe.entity.RecipeSteps;
 import recipe.entity.User;
 import recipe.service.RecipeServiceImpl;
 import recipe.service.UserServiceImpl;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -32,19 +38,25 @@ public class RecipeController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return recipeService.saveRecipe(recipeWithStepsDTO.getRecipe(), user, recipeWithStepsDTO.getSteps());
+        return recipeService.saveRecipe(recipeWithStepsDTO.getRecipe(), user);
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "레시피 수정", description = "기존의 레시피를 수정합니다. 레시피 ID와 수정된 정보를 전달합니다.")
-    @Transactional
-    public Recipe updateRecipe(@PathVariable Long id, @RequestBody RecipeWithStepsDto recipeWithStepsDTO, @RequestParam Long userId) {
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
+    @PutMapping("/recipes/{recipeId}")
+    public ResponseEntity<Recipe> updateRecipe(
+            @PathVariable Long recipeId,
+            @RequestParam Long userId,
+            @RequestBody Map<String, Object> request) {
 
-        return recipeService.updateRecipe(id, recipeWithStepsDTO.getRecipe(), user, recipeWithStepsDTO.getSteps());
+        User user = userService.getUserById(userId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Recipe updatedRecipe = objectMapper.convertValue(request.get("recipe"), Recipe.class);
+
+        List<RecipeSteps> steps = objectMapper.convertValue(request.get("recipeSteps"),
+                new TypeReference<List<RecipeSteps>>() {});
+
+        Recipe savedRecipe = recipeService.updateRecipe(recipeId, updatedRecipe, user, steps);
+        return ResponseEntity.ok(savedRecipe);
     }
 
 
