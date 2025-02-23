@@ -46,8 +46,16 @@ public class User {
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
+    
+    // 활동 정지 여부: false (기본값, 활성) / true (정지)
+    @Column(nullable = false)
+    private boolean suspended = false;
 
     public boolean isAdmin() {
         return this.role == UserRole.ADMIN;
+    }
+    
+    public boolean isSuspended() {
+        return suspended;
     }
 }
