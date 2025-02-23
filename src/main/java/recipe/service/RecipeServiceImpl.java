@@ -3,6 +3,7 @@ package recipe.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -12,6 +13,7 @@ import recipe.repository.RecipeStepRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
@@ -125,27 +127,25 @@ public class RecipeServiceImpl implements RecipeService {
 		recipeRepository.save(recipe);
 	}
 
-	// 일반 사용자의 레시피 조회
+
+	// 일반 사용자용 레시피 조회 (deletedYn = false)
 	@Override
-	public List<Recipe> getAllRecipes() {
+	public List<RecipeSummaryDto> getAllRecipes() {
 		List<Recipe> recipes = recipeRepository.findByDeletedYnFalse();
-		for (Recipe recipe : recipes) {
-			// 레시피와 연관된 스텝을 함께 반환
-			recipe.setRecipeSteps(recipeStepRepository.findByRecipeId(recipe.getRecipeId()));
-		}
-		return recipes;
+		return recipes.stream()
+				.map(recipe -> new RecipeSummaryDto(recipe.getRecipeId(), recipe.getTitle()))
+				.collect(Collectors.toList());
 	}
 
-	// 관리자 사용자의 레시피 조회
+	// 관리자용 전체 레시피 조회 (삭제된 레시피 포함)
 	@Override
-	public List<Recipe> getAllRecipesForAdmin() {
+	public List<RecipeSummaryDto> getAllRecipesForAdmin() {
 		List<Recipe> recipes = recipeRepository.findAll();
-		for (Recipe recipe : recipes) {
-			// 레시피와 연관된 스텝을 함께 반환
-			recipe.setRecipeSteps(recipeStepRepository.findByRecipeId(recipe.getRecipeId()));
-		}
-		return recipes;
+		return recipes.stream()
+				.map(recipe -> new RecipeSummaryDto(recipe.getRecipeId(), recipe.getTitle()))
+				.collect(Collectors.toList());
 	}
+
 
 	@Override
 	public Optional<Recipe> getRecipeById(Long recipeId) {

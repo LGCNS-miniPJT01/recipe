@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "recipesteps")  // 🔥 테이블 이름 정확히 매칭
+@Table(name = "steps")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +16,7 @@ public class RecipeSteps {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stepId;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 🔥 지연 로딩으로 최적화
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 

@@ -1,5 +1,6 @@
 package recipe.service;
 
+import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -19,11 +20,12 @@ public interface RecipeService {
 	void softDeleteRecipe(Long recipeId, User user);
 
 	// 일반 사용자의 레시피 조회
-	List<Recipe> getAllRecipes();
+	List<RecipeSummaryDto> getAllRecipes();
 
 	// 관리자 사용자의 모든 레시피 조회
-	List<Recipe> getAllRecipesForAdmin();
+	List<RecipeSummaryDto> getAllRecipesForAdmin();
 
 	// 리시피 아이디로 레시피 조회
 	Optional<Recipe> getRecipeById(Long recipeId);
+
 }

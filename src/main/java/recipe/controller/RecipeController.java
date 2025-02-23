@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import recipe.dto.RecipeDetailDto;
 import recipe.dto.RecipeStepDto;
+import recipe.dto.RecipeSummaryDto;
 import recipe.dto.RecipeWithStepsDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
@@ -45,6 +47,7 @@ public class RecipeController {
     }
 
     @PutMapping("/recipes/{recipeId}")
+    @Operation(summary = "레시피 수정", description = "기존 레시피를 수정합니다. 사용자의 ID와 함께 수정할 내용을 전달합니다.")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long recipeId,
             @RequestParam Long userId,
@@ -62,38 +65,36 @@ public class RecipeController {
         return ResponseEntity.ok(savedRecipe);
     }
 
-
     @DeleteMapping("/{recipeId}")
-    @Operation(summary = "레시피 삭제", description = "레시피를 삭제합니다. 사용자가 본인의 레시피만 삭제할 수 있습니다. 관리자는 모든 레시피 삭제 가능.")
+    @Operation(summary = "레시피 삭제", description = "레시피를 삭제합니다. 사용자가 본인의 레시피만 삭제할 수 있으며, 관리자는 모든 레시피를 삭제할 수 있습니다.")
     public String deleteRecipe(@PathVariable Long recipeId, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
         recipeService.softDeleteRecipe(recipeId, user);
         return "레시피가 삭제되었습니다.";
     }
 
-    // ✅ 일반 사용자의 레시피 조회 (삭제되지 않은 레시피만)
     @GetMapping
-    public ResponseEntity<List<Recipe>> getAllRecipes() {
-        List<Recipe> recipes = recipeService.getAllRecipes();
+    @Operation(summary = "일반 사용자 레시피 조회", description = "삭제되지 않은 레시피 목록을 조회합니다. (id, 제목만 반환)")
+    public ResponseEntity<List<RecipeSummaryDto>> getAllRecipes() {
+        List<RecipeSummaryDto> recipes = recipeService.getAllRecipes();
         return ResponseEntity.ok(recipes);
     }
 
-    // ✅ 관리자용 전체 레시피 조회 (삭제된 레시피 포함)
     @GetMapping("/admin")
-    public ResponseEntity<List<Recipe>> getAllRecipesForAdmin(@RequestParam Long userId) {
+    @Operation(summary = "관리자 레시피 조회", description = "삭제된 레시피를 포함한 전체 목록을 조회합니다. (id, 제목만 반환)")
+    public ResponseEntity<List<RecipeSummaryDto>> getAllRecipesForAdmin(@RequestParam Long userId) {
         User user = userService.getUserById(userId);
 
-        // 관리자 권한 확인
-        if (!user.isAdmin()) {
+        if (user == null || !user.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        List<Recipe> recipes = recipeService.getAllRecipesForAdmin();
+        List<RecipeSummaryDto> recipes = recipeService.getAllRecipesForAdmin();
         return ResponseEntity.ok(recipes);
     }
 
-    // 특정 레시피 상세 조회 (일반 사용자 & 관리자)
     @GetMapping("/{recipeId}")
+    @Operation(summary = "레시피 상세 조회", description = "레시피의 상세 정보를 조회합니다. 삭제된 레시피는 관리자만 조회 가능합니다.")
     public RecipeDetailDto getRecipeDetail(@PathVariable Long recipeId, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
@@ -103,13 +104,14 @@ public class RecipeController {
         Recipe recipe = recipeService.getRecipeById(recipeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
 
-        if (recipe.isDeletedYn() && !user.isAdmin()) {  // 관리자가 아니면 삭제된 레시피는 못 봄
+        if (recipe.isDeletedYn() && !user.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe has been deleted");
         }
 
+        Hibernate.initialize(recipe.getRecipeSteps());
+
         return convertToRecipeDetailDto(recipe);
     }
-
 
     public RecipeDetailDto convertToRecipeDetailDto(Recipe recipe) {
         RecipeDetailDto dto = new RecipeDetailDto();
@@ -129,7 +131,6 @@ public class RecipeController {
         dto.setIngredients(recipe.getIngredients());
         dto.setTip(recipe.getTip());
 
-        // RecipeSteps -> RecipeStepDto 변환
         dto.setSteps(recipe.getRecipeSteps().stream().map(step -> {
             RecipeStepDto stepDto = new RecipeStepDto();
             stepDto.setStepId(step.getStepId());
@@ -141,7 +142,5 @@ public class RecipeController {
 
         return dto;
     }
-
-
-
 }
+

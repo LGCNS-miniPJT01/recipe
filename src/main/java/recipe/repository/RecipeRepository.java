@@ -14,5 +14,4 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>{
     // 관리자만 모든 레시피(삭제된 것 포함) 조회 가능
     List<Recipe> findAll();
 
-
 }
