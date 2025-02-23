@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import recipe.dto.FindEmailRequestDto;
+import recipe.dto.FindPasswordRequestDto;
 import recipe.dto.LoginRequestDto;
+import recipe.dto.ResetPasswordDto;
 import recipe.dto.UserRegisterDto;
 import recipe.service.UserServiceImpl;
 
@@ -52,6 +54,28 @@ public class UserController {
         String maskedEmail = userService.findEmail(findEmailRequestDto);
         log.info("✅ [이메일 찾기 완료]");
         return ResponseEntity.ok(maskedEmail);
+    }
+    
+    // 1️⃣ 비밀번호 재설정을 위한 계정찾기 
+    @PostMapping("/findpwuser")
+    @Operation(summary ="비밀번호 재설정 사용자 계정 확인", description = "이메일,이름,전화번호로 계정 찾기 기능")
+    public ResponseEntity<String> findUser(@RequestBody FindPasswordRequestDto requestDto) {
+		log.info("📍[계정 찾기 요청 ]");
+        boolean userExists = userService.findUser(requestDto);
+        if (userExists) {
+            return ResponseEntity.ok("사용자 확인됨");
+        } else {
+            return ResponseEntity.badRequest().body("등록된 계정을 찾을 수 없습니다.");
+        }
+    }
+    
+    // 2️⃣ 비밀번호 변경 API (DTO 사용)
+    @PostMapping("/resetpassword")
+    @Operation(summary = "비밀번호 변경 요청", description = "사용자 입력값으로 비밀번호 변경")
+    public ResponseEntity<String> resetPassword(@RequestBody @Validated ResetPasswordDto resetPasswordDto) {
+    	log.info("📍[비밀번호 변경 요청]");
+        userService.resetPassword(resetPasswordDto);
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 
 }

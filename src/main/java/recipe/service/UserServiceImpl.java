@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import recipe.dto.FindEmailRequestDto;
+import recipe.dto.FindPasswordRequestDto;
 import recipe.dto.LoginRequestDto;
+import recipe.dto.ResetPasswordDto;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 import recipe.entity.UserRole;
@@ -117,4 +119,35 @@ public class UserServiceImpl implements UserService{
 
         return prefix + masked + domain;
     }
+    
+
+    // 비밀번호 재설정 전 계정 확인 
+	@Override
+	public boolean findUser(FindPasswordRequestDto requestDto) {
+		return userRepository.findByUsernameAndEmailAndPhone(
+                requestDto.getUsername(),
+                requestDto.getEmail(),
+                requestDto.getPhone()
+        ).isPresent();
+	}
+
+	// 비밀번호 재설정
+	@Override
+	@Transactional
+	public void resetPassword(ResetPasswordDto resetPasswordDto) {
+		String email = resetPasswordDto.getEmail();
+        String newPassword = resetPasswordDto.getNewPassword();
+        String confirmPassword = resetPasswordDto.getConfirmPassword();
+
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+		
+	}
 }

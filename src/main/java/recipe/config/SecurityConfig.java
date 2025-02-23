@@ -30,6 +30,7 @@ public class SecurityConfig {
                     "/api/users/register",  // 회원가입
                     "/api/users/login", // 로그인
                     "/api/users/findemail", // 이메일 찾기
+                    "/api/users/**", 
                     "/api/user/list"
                     
                 ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
