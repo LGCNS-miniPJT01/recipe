@@ -1,8 +1,10 @@
 package recipe.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
@@ -137,6 +139,17 @@ public class RecipeServiceImpl implements RecipeService {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	@Transactional
+	public Recipe getRecipeByIdWithViewCount(Long recipeId) {
+		Recipe recipe = recipeRepository.findById(recipeId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+
+		// 조회수 증가
+		recipe.setViewCount(recipe.getViewCount() + 1);
+		return recipe;
+	}
+
 	// 관리자용 전체 레시피 조회 (삭제된 레시피 포함)
 	@Override
 	public List<RecipeSummaryDto> getAllRecipesForAdmin() {
@@ -150,6 +163,13 @@ public class RecipeServiceImpl implements RecipeService {
 	@Override
 	public Optional<Recipe> getRecipeById(Long recipeId) {
 		return recipeRepository.findById(recipeId);
+	}
+
+	// 조회수
+	public int getRecipeViewCount(Long recipeId) {
+		Recipe recipe = recipeRepository.findById(recipeId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+		return recipe.getViewCount();
 	}
 
 }

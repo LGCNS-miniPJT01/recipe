@@ -94,15 +94,14 @@ public class RecipeController {
     }
 
     @GetMapping("/{recipeId}")
-    @Operation(summary = "레시피 상세 조회", description = "레시피의 상세 정보를 조회합니다. 삭제된 레시피는 관리자만 조회 가능합니다.")
+    @Operation(summary = "레시피 상세 조회", description = "레시피의 상세 정보를 조회하며 조회수를 증가시킵니다.")
     public RecipeDetailDto getRecipeDetail(@PathVariable Long recipeId, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        Recipe recipe = recipeService.getRecipeById(recipeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+        Recipe recipe = recipeService.getRecipeByIdWithViewCount(recipeId);
 
         if (recipe.isDeletedYn() && !user.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe has been deleted");
@@ -142,5 +141,13 @@ public class RecipeController {
 
         return dto;
     }
+
+    @GetMapping("/{recipeId}/views")
+    @Operation(summary = "레시피 조회수 확인", description = "특정 레시피의 조회수를 반환합니다.")
+    public ResponseEntity<Integer> getRecipeViewCount(@PathVariable Long recipeId) {
+        int viewCount = recipeService.getRecipeViewCount(recipeId);
+        return ResponseEntity.ok(viewCount);
+    }
+
 }
 

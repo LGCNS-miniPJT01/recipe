@@ -28,4 +28,5 @@ public interface RecipeService {
 	// 리시피 아이디로 레시피 조회
 	Optional<Recipe> getRecipeById(Long recipeId);
 
+	Recipe getRecipeByIdWithViewCount(Long recipeId);
 }

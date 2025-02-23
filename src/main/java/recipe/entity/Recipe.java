@@ -77,4 +77,7 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe")
     private List<RecipeSteps> recipeSteps;
+
+    @Column(nullable = false)
+    private int viewCount = 0;
 }
