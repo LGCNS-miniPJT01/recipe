@@ -11,6 +11,7 @@ import recipe.repository.ScrapRepository;
 import recipe.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,10 @@ public class ScrapServiceImpl implements ScrapService {
     }
 
     @Override
-    public List<Scrap> getScrappedRecipes(Long userId) {
-        return scrapRepository.findByUserUserId(userId);
+    public List<Long> getScrapList(Long userId) {
+        return scrapRepository.findByUser_UserId(userId)
+                .stream()
+                .map(scrap -> scrap.getRecipe().getRecipeId())
+                .collect(Collectors.toList());
     }
 }

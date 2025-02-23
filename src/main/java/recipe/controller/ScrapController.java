@@ -36,21 +36,10 @@ public class ScrapController {
     }
 
     @GetMapping("/{userId}")
-    @Operation(summary = "사용자의 스크랩한 레시피 목록 조회", description = "사용자가 스크랩한 레시피 목록을 반환합니다.")
-    public ResponseEntity<List<Map<String, Object>>> getScrappedRecipes(@PathVariable Long userId) {
-        List<Scrap> scraps = scrapService.getScrappedRecipes(userId);
-
-        List<Map<String, Object>> scrappedRecipes = scraps.stream()
-                .map(scrap -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("scrapId", scrap.getScrapId());
-                    map.put("recipeId", scrap.getRecipe().getRecipeId());
-                    map.put("recipeTitle", scrap.getRecipe().getTitle());
-                    return map;
-                })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(scrappedRecipes);
+    @Operation(summary = "개인 레시피 목록 조회", description = "유저 ID를 입력하면 스크랩한 레시피 ID 목록을 반환합니다.")
+    public ResponseEntity<List<Long>> getScrapList(@PathVariable Long userId) {
+        List<Long> recipeIds = scrapService.getScrapList(userId);
+        return ResponseEntity.ok(recipeIds);
     }
 
 }
