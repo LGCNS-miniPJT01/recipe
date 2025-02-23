@@ -1,11 +1,10 @@
 package recipe.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import recipe.entity.User;
+
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
@@ -14,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	boolean existsByEmail(String email);
     Optional<User> findByUsernameAndPhone(String username, String phone);
     Optional<User> findByUsernameAndEmailAndPhone(String username, String email, String phone);
+	Optional<User> findByUsername(String username);
 }

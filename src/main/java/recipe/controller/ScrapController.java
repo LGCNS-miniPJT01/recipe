@@ -5,13 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import recipe.entity.Scrap;
 import recipe.service.ScrapService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/scrap")
@@ -20,6 +17,7 @@ import java.util.stream.Collectors;
 public class ScrapController {
 
     private final ScrapService scrapService;
+
 
     @PostMapping("/{recipeId}")
     @Operation(summary = "스크랩 추가", description = "레시피를 스크랩합니다.")
