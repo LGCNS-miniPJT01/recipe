@@ -13,11 +13,9 @@ import recipe.repository.RecipeRepository;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
-	
 	@Autowired
 	private RecipeRepository recipeRepository;
 
-	//본인 레시피 삭제(관리자는 모든 레시피 삭제 가능)
 	@Override
 	@Transactional
 	public void softDeleteRecipe(Long recipeId, User user) {
@@ -39,7 +37,6 @@ public class RecipeServiceImpl implements RecipeService {
         recipeRepository.save(recipe);
 	}
 
-	//레시피 저장
 	@Override
 	@Transactional
 	public Recipe saveRecipe(Recipe recipe) {
