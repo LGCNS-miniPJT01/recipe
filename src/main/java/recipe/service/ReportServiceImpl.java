@@ -25,7 +25,6 @@ public class ReportServiceImpl implements ReportService{
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
         Report report = new Report();
-        report.setUser(recipe.getUser());
         report.setRecipe(recipe);
         report.setReason(reason);
         report.setStatus(Report.ReportStatus.PENDING);

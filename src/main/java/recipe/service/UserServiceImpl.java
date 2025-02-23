@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService{
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return jwtUtil.createJwt(user.getEmail(), "USER", 3600000L); // 1시간짜리 JWT 생성
+        String roleString = user.getRole().toString();
+        return jwtUtil.createJwt(user.getEmail(), roleString, 3600000L); // 1시간짜리 JWT 생성
     }
 }
