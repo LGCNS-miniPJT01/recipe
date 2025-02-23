@@ -29,6 +29,7 @@ public class SecurityConfig {
                     // 나중에 비로그인 사용자 기능을 추가하려면 아래 url 추가 
                     "/api/users/register",  // 회원가입
                     "/api/users/login", // 로그인
+                    "/api/users/findemail", // 이메일 찾기
                     "/api/user/list"
                     
                 ).permitAll()  // Swagger 경로는 인증 없이 접근 가능

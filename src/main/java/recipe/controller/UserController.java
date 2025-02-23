@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import recipe.dto.FindEmailRequestDto;
 import recipe.dto.LoginRequestDto;
 import recipe.dto.UserRegisterDto;
 import recipe.service.UserServiceImpl;
@@ -41,6 +42,16 @@ public class UserController {
         String token = userService.login(loginRequestDto);
         log.info("✅ [로그인  완료] email: {}", loginRequestDto.getEmail());
         return ResponseEntity.ok(token); // JWT 토큰 반환
+    }
+    
+    // 이메일 찾기
+    @PostMapping("/findemail")
+    @Operation(summary ="이메일 찾기", description = "이름,전화번호로 이메일 찾기 기능")
+    public ResponseEntity<String> findEmail(@RequestBody FindEmailRequestDto findEmailRequestDto) {
+		log.info("📍[이메일 찾기 요청] username: {}, phone: {}", findEmailRequestDto.getUsername(), findEmailRequestDto.getPhone());
+        String maskedEmail = userService.findEmail(findEmailRequestDto);
+        log.info("✅ [이메일 찾기 완료]");
+        return ResponseEntity.ok(maskedEmail);
     }
 
 }

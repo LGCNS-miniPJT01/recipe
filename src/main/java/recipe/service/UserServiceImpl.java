@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import recipe.dto.FindEmailRequestDto;
 import recipe.dto.LoginRequestDto;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
@@ -68,6 +69,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String login(LoginRequestDto loginRequestDto) {
 		
+		// validation 검증 (NPE)
 		if(loginRequestDto.getEmail() == null || loginRequestDto.getEmail().isBlank()) {
 			throw new IllegalArgumentException("이메일을 입력해주세요.");
 		}
@@ -80,5 +82,39 @@ public class UserServiceImpl implements UserService{
 
         String roleString = user.getRole().toString();
         return jwtUtil.createJwt(user.getEmail(), roleString, 3600000L); // 1시간짜리 JWT 생성
+    }
+
+	// 이메일 찾기 
+	@Override
+	public String findEmail(FindEmailRequestDto findEmailRequestDto) {
+		// validation 검증 (NPE)
+		if(findEmailRequestDto.getUsername() == null || findEmailRequestDto.getUsername().isBlank()) {
+			throw new IllegalArgumentException("사용자 이름을 입력해주세요.");
+		}
+		
+		if(findEmailRequestDto.getPhone() == null || findEmailRequestDto.getPhone().isBlank()) {
+			throw new IllegalArgumentException("전화번호를 입력해주세요.");
+		}
+		
+		// 이름과 전화번호가 일치하는 사용자 조회
+        User user = userRepository.findByUsernameAndPhone(
+                        findEmailRequestDto.getUsername(), 
+                        findEmailRequestDto.getPhone())
+                .orElseThrow(() -> new IllegalArgumentException("등록된 이메일이 없습니다."));
+
+        // 이메일 마스킹 처리 (ex: te****@gmail.com)
+        return maskEmail(user.getEmail());
+	}
+	
+	// 이메일 마스킹 처리 로직
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf("@");
+        if (atIndex <= 6) return email; // 이메일이 너무 짧으면 그대로 반환
+
+        String prefix = email.substring(0, 2);
+        String masked = "****";
+        String domain = email.substring(atIndex);
+
+        return prefix + masked + domain;
     }
 }
