@@ -42,6 +42,12 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 사용자가 없습니다."));
 	}
 
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
 	// 회원가입
 	@Override
 	@Transactional
