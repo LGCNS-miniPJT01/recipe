@@ -22,6 +22,7 @@ public class RecipeServiceImpl implements RecipeService {
 	@Autowired
 	private RecipeStepRepository recipeStepRepository;
 
+
 	@Override
 	@Transactional
 	public Recipe saveRecipe(Recipe newRecipe, User user) {
@@ -145,4 +146,10 @@ public class RecipeServiceImpl implements RecipeService {
 		}
 		return recipes;
 	}
+
+	@Override
+	public Optional<Recipe> getRecipeById(Long recipeId) {
+		return recipeRepository.findById(recipeId);
+	}
+
 }

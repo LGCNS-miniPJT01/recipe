@@ -5,6 +5,7 @@ import recipe.entity.RecipeSteps;
 import recipe.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RecipeService {
 
@@ -22,4 +23,7 @@ public interface RecipeService {
 
 	// 관리자 사용자의 모든 레시피 조회
 	List<Recipe> getAllRecipesForAdmin();
+
+	// 리시피 아이디로 레시피 조회
+	Optional<Recipe> getRecipeById(Long recipeId);
 }
