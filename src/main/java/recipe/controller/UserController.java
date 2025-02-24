@@ -90,22 +90,34 @@ public class UserController {
 
     // 유저 목록 조회
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers(@RequestBody Long userId) {
+    	User adminCheck = userService.getUserById(userId);
+    	if (adminCheck == null || !adminCheck.isAdmin()) {
+            return ResponseEntity.status(403).body(null); // 권한 없으면 403 반환
+        }
         List<User> users = adminService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     // 유저 정지 (Suspended 상태 변경)
     @PutMapping("/users/{userId}/suspend")
-    public ResponseEntity<User> suspendUser(@PathVariable Long userId) {
-        User suspendedUser = adminService.suspendUser(userId);
+    public ResponseEntity<User> suspendUser(@PathVariable Long stopId, @RequestBody Long userId) {
+    	User adminCheck = userService.getUserById(userId);
+    	if (adminCheck == null || !adminCheck.isAdmin()) {
+            return ResponseEntity.status(403).body(null); // 권한 없으면 403 반환
+        }
+        User suspendedUser = adminService.suspendUser(stopId);
         return ResponseEntity.ok(suspendedUser);
     }
 
     // 유저 활성화 (Suspended 상태 변경)
     @PutMapping("/users/{userId}/activate")
-    public ResponseEntity<User> activateUser(@PathVariable Long userId) {
-        User activatedUser = adminService.activateUser(userId);
+    public ResponseEntity<User> activateUser(@PathVariable Long activateId, @RequestBody Long userId) {
+    	User adminCheck = userService.getUserById(userId);
+    	if (adminCheck == null || !adminCheck.isAdmin()) {
+            return ResponseEntity.status(403).body(null); // 권한 없으면 403 반환
+        }
+        User activatedUser = adminService.activateUser(activateId);
         return ResponseEntity.ok(activatedUser);
     }
 }
