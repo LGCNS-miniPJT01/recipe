@@ -149,4 +149,10 @@ public class RecipeController {
         return ResponseEntity.ok(viewCount);
     }
 
+    // 좋아요 수가 높은 순서대로 레시피 목록 조회
+    @GetMapping("/top-liked")
+    public ResponseEntity<List<Recipe>> getTopLikedRecipes() {
+        List<Recipe> topRecipes = recipeService.getTopRecipesByFavoriteCount();
+        return ResponseEntity.ok(topRecipes);
+    }
 }

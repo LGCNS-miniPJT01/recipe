@@ -28,5 +28,9 @@ public interface RecipeService {
 	// 리시피 아이디로 레시피 조회
 	Optional<Recipe> getRecipeById(Long recipeId);
 
+	//레시피의 조회수 확인
 	Recipe getRecipeByIdWithViewCount(Long recipeId);
+	
+	//좋아요 수(내림차순)으로 레시피 조회
+	List<Recipe> getTopRecipesByFavoriteCount();
 }

@@ -1,21 +1,23 @@
 package recipe.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
+import recipe.repository.FavoriteRepository;
 import recipe.repository.RecipeRepository;
 import recipe.repository.RecipeStepRepository;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
@@ -25,6 +27,9 @@ public class RecipeServiceImpl implements RecipeService {
 
 	@Autowired
 	private RecipeStepRepository recipeStepRepository;
+	
+	@Autowired
+	private FavoriteRepository favoriteRepository;
 
 	// 레시피 저장
 	@Override
@@ -172,4 +177,14 @@ public class RecipeServiceImpl implements RecipeService {
 		return recipe.getViewCount();
 	}
 
+	@Override
+	//좋아요 수(내림차순)을 기준으로 레시피 받기
+	public List<Recipe> getTopRecipesByFavoriteCount() {
+        List<Object[]> result = favoriteRepository.findTopRecipesByFavoriteCount();
+        
+        // 결과를 Recipe 리스트로 변환
+        return result.stream()
+                     .map(r -> (Recipe) r[0])  // 첫 번째 요소는 Recipe 객체
+                     .collect(Collectors.toList());
+    }
 }
