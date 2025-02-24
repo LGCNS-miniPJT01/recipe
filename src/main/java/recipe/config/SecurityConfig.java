@@ -29,9 +29,10 @@ public class SecurityConfig {
                     // 나중에 비로그인 사용자 기능을 추가하려면 아래 url 추가 
                     "/api/users/register",  // 회원가입
                     "/api/users/login", // 로그인
-                    "/api/users/**"
-                    
-                ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
+                    "/api/users/**," +
+                    "/api/recipe/**",
+                        "api/comments/**"
+               ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
                 .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
             )
             .csrf(csrf -> csrf.disable());  // 🚨 CSRF 보호 비활성화 (테스트 환경에서만)
