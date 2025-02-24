@@ -1,21 +1,24 @@
 package recipe.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import recipe.dto.RecipeSearchDto;
 import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
 import recipe.repository.RecipeRepository;
 import recipe.repository.RecipeStepRepository;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeServiceImpl implements RecipeService {
@@ -25,6 +28,9 @@ public class RecipeServiceImpl implements RecipeService {
 
 	@Autowired
 	private RecipeStepRepository recipeStepRepository;
+	
+	@Autowired
+	private  ModelMapper modelMapper;
 
 	// 레시피 저장
 	@Override
@@ -171,5 +177,62 @@ public class RecipeServiceImpl implements RecipeService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
 		return recipe.getViewCount();
 	}
+
+	// 레서피 제목으로 검색
+	@Override
+	public List<RecipeSearchDto> searchRecipesByTitle(String title) {
+        List<Recipe> recipes = recipeRepository.findByTitleContainingAndDeletedYnFalse(title);
+        return recipes.stream()
+                .map((Recipe recipe) -> modelMapper.map(recipe, RecipeSearchDto.class)) // 타입 명시!
+                .collect(Collectors.toList());
+        		
+        		
+	}
+
+	// 레서피 재료로 검색
+	@Override
+	public List<RecipeSearchDto> searchRecipesByIngredient(String ingredient) {
+		List<Recipe> recipes = recipeRepository.findByIngredientsContainingAndDeletedYnFalse(ingredient);
+        return recipes.stream()
+                .map(recipe -> modelMapper.map(recipe, RecipeSearchDto.class)) // ModelMapper 적용
+                .collect(Collectors.toList());
+    }
+
+	// 필터링 없이 전체 검색 (제목,재료,요리순서에 들어간 내용 조회)
+	@Override
+	public List<RecipeSearchDto> searchRecipes(String keyword) {
+		List<Recipe> recipes = recipeRepository.searchByKeyword(keyword);
+        return recipes.stream()
+                .map(recipe -> modelMapper.map(recipe, RecipeSearchDto.class))
+                .collect(Collectors.toList());
+    }
+
+	// 필터링(밥,국,후식 등) 선택 후 전체 검색
+	@Override
+	public List<RecipeSearchDto> searchRecipesByCategory(String category, String keyword) {
+		List<Recipe> recipes = recipeRepository.searchByCategorAndKeyword(category, keyword);
+		return recipes.stream()
+	                .map(recipe -> modelMapper.map(recipe, RecipeSearchDto.class))
+	                .collect(Collectors.toList());
+	}
+
+	// 카테고리 필터링 후 요리 이름으로 검색
+	@Override
+	public List<RecipeSearchDto> searchRecipesByCategoryaAndTitle(String category, String keyword) {
+		List<Recipe> recipes = recipeRepository.searchByCategoryAndTitle(category, keyword);
+		return recipes.stream()
+	                .map(recipe -> modelMapper.map(recipe, RecipeSearchDto.class))
+	                .collect(Collectors.toList());
+	}
+
+	// 카테고리 필터링 후 재료로  검색
+	@Override
+	public List<RecipeSearchDto> searchRecipesByCategoryaAnIngredient(String category, String keyword) {
+		List<Recipe> recipes = recipeRepository.searchByCategoryAndIngredients(category, keyword);
+		return recipes.stream()
+	                .map(recipe -> modelMapper.map(recipe, RecipeSearchDto.class))
+	                .collect(Collectors.toList());
+	}
+	
 
 }
