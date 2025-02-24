@@ -27,7 +27,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -36,7 +36,7 @@ public class User {
     @Column(nullable = false, length = 255)
     private String passwordHash;
     
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true, length = 255)
     private String phone;
     
     @Enumerated(EnumType.STRING)
@@ -46,8 +46,16 @@ public class User {
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
+    
+    // 활동 정지 여부: false (기본값, 활성) / true (정지)
+    @Column(nullable = false)
+    private boolean suspended = false;
 
     public boolean isAdmin() {
         return this.role == UserRole.ADMIN;
+    }
+    
+    public boolean isSuspended() {
+        return suspended;
     }
 }
