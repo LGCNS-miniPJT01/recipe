@@ -28,9 +28,9 @@ public class CommentController {
     @PostMapping("/{recipeId}")
     @Operation(summary = "댓글 작성", description = "특정 레시피에 댓글을 작성합니다.")
     public ResponseEntity<Comment> addComment(
-            @Parameter(description = "레시피 ID") @PathVariable Long recipeId,
-            @Parameter(description = "댓글 내용") @RequestParam String content,
-            @Parameter(description = "작성자 ID") @RequestParam Long userId
+            @Parameter(description = "레시피 ID") @PathVariable("recipeId") Long recipeId,
+            @Parameter(description = "댓글 내용") @RequestParam(value = "content") String content,
+            @Parameter(description = "작성자 ID") @RequestParam(value = "userId") Long userId
     ) {
         User user = userService.getUserById(userId);
         Comment comment = commentService.saveComment(recipeId, content, user);

@@ -4,6 +4,7 @@ import recipe.dto.FindEmailRequestDto;
 import recipe.dto.FindPasswordRequestDto;
 import recipe.dto.LoginRequestDto;
 import recipe.dto.ResetPasswordDto;
+import recipe.dto.UserDetailDTO;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 
@@ -16,4 +17,6 @@ public interface UserService {
     String findEmail(FindEmailRequestDto findEmailRequestDto);
     boolean findUser(FindPasswordRequestDto requestDto);
     void resetPassword(ResetPasswordDto resetPasswordDto);
+    UserDetailDTO getProfile(Long userId);
+    UserDetailDTO updateProfile(Long userId, UserDetailDTO userDetailDTO);
 }
