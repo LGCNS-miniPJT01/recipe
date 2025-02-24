@@ -1,20 +1,12 @@
 package recipe.entity;
 
-import java.util.Date;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Recipes")
@@ -22,6 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Recipe {
+    private Long id;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,4 +74,10 @@ public class Recipe {
     
     @Column(nullable = false)
     private boolean deletedYn = false;
+
+    @OneToMany(mappedBy = "recipe")
+    private List<RecipeSteps> recipeSteps;
+
+    @Column(nullable = false)
+    private int viewCount = 0;
 }
