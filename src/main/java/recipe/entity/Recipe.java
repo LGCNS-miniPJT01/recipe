@@ -75,7 +75,8 @@ public class Recipe {
     @Column(nullable = false)
     private boolean deletedYn = false;
 
-    @OneToMany(mappedBy = "recipe")
+    // recipesteps 자동 저장을 위한 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeSteps> recipeSteps;
 
     @Column(nullable = false)
