@@ -7,6 +7,9 @@ import recipe.entity.User;
 import recipe.entity.Report.ReportStatus;
 
 public interface AdminService {
-	List<Report> getAllPendingReports(User admin); 
-	Report updateReportStatus(User admin, Long reportId, ReportStatus status);
+	List<Report> getAllPendingReports(); 
+	Report updateReportStatus(Long reportId, ReportStatus status);
+	User suspendUser(Long userId);
+	User activateUser(Long userId);
+	List<User> getAllUsers();
 }

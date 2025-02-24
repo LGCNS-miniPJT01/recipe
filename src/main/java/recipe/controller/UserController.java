@@ -1,9 +1,14 @@
 package recipe.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import recipe.dto.LoginRequestDto;
 import recipe.dto.UserRegisterDto;
+import recipe.entity.User;
+import recipe.service.AdminService;
 import recipe.service.UserServiceImpl;
 
 @Slf4j 
@@ -23,6 +30,9 @@ public class UserController {
 	
 	@Autowired
 	private UserServiceImpl userService;
+	
+	@Autowired
+	private AdminService adminService;
 	
 	@PostMapping("/register")
 	@Operation(summary = "회원가입", description = "회원가입기능")
@@ -43,4 +53,24 @@ public class UserController {
         return ResponseEntity.ok(token); // JWT 토큰 반환
     }
 
+    // 유저 목록 조회
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = adminService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    // 유저 정지 (Suspended 상태 변경)
+    @PutMapping("/users/{userId}/suspend")
+    public ResponseEntity<User> suspendUser(@PathVariable Long userId) {
+        User suspendedUser = adminService.suspendUser(userId);
+        return ResponseEntity.ok(suspendedUser);
+    }
+
+    // 유저 활성화 (Suspended 상태 변경)
+    @PutMapping("/users/{userId}/activate")
+    public ResponseEntity<User> activateUser(@PathVariable Long userId) {
+        User activatedUser = adminService.activateUser(userId);
+        return ResponseEntity.ok(activatedUser);
+    }
 }

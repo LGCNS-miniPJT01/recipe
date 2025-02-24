@@ -12,6 +12,7 @@ import recipe.entity.Report.ReportStatus;
 import recipe.entity.User;
 import recipe.repository.RecipeRepository;
 import recipe.repository.ReportRepository;
+import recipe.repository.UserRepository;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -22,23 +23,19 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	private RecipeRepository recipeRepository;
 	
+	@Autowired
+	private UserRepository userRepository;
+	
 	//관리자만 신고 조회
 	@Override
-	public List<Report> getAllPendingReports(User admin) {
-		if (!admin.isAdmin()) {
-            throw new SecurityException("관리자만 신고 목록을 조회할 수 있습니다.");
-        }
+	public List<Report> getAllPendingReports() {
 		return reportRepository.findByStatus(Report.ReportStatus.PENDING);
 	}
 
 	//관리자의 신고처리
 	@Override
 	@Transactional
-	public Report updateReportStatus(User admin, Long reportId, ReportStatus status) {
-        if (!admin.isAdmin()) {
-            throw new SecurityException("관리자만 신고를 처리할 수 있습니다.");
-        }
-
+	public Report updateReportStatus(Long reportId, ReportStatus status) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신고입니다."));
         report.setStatus(status);
@@ -53,4 +50,26 @@ public class AdminServiceImpl implements AdminService {
         return reportRepository.save(report);
     }
 
+	@Override
+	@Transactional
+	public User suspendUser(Long userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+		user.setSuspended(true);
+		return userRepository.save(user);
+	}
+
+	@Override
+	@Transactional
+	public User activateUser(Long userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+		user.setSuspended(false);
+		return userRepository.save(user);
+	}
+
+	@Override
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
+
+	
 }
