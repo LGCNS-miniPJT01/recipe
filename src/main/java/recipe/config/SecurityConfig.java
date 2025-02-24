@@ -31,7 +31,7 @@ public class SecurityConfig {
                     "/api/users/login", // 로그인
                     "/api/users/**," +
                     "/api/recipe/**",
-                        "api/comments/**"
+                    "api/comments/**"
                ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
                 .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
             )
