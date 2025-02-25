@@ -164,7 +164,7 @@ public class RecipeController {
     }
 
     // 좋아요 수가 높은 순서대로 레시피 목록 조회
-    @GetMapping("/top-liked")
+    @GetMapping("/topliked")
     public ResponseEntity<List<Recipe>> getTopLikedRecipes() {
         List<Recipe> topRecipes = recipeService.getTopRecipesByFavoriteCount();
         return ResponseEntity.ok(topRecipes);

@@ -60,6 +60,15 @@ dependencies {
     
     // validator (@Valid, @NotNull, @Size)
     implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+    
+    // WebSocket 및 STOMP 지원
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // SockJS (WebSocket 미지원 환경에서도 작동 가능하게 하기 위함)
+    implementation 'org.webjars:sockjs-client:1.5.1'
+
+    // STOMP 클라이언트 (STOMP 메시징 지원)
+    implementation 'org.webjars:stomp-websocket:2.3.4'
 
     
 	

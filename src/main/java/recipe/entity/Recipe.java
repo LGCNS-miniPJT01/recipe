@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -91,6 +92,7 @@ public class Recipe {
 
     // recipesteps 자동 저장을 위한 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore  
     private List<RecipeSteps> recipeSteps;
 
     @Column(nullable = false)

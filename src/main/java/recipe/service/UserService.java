@@ -19,4 +19,5 @@ public interface UserService {
     void resetPassword(ResetPasswordDto resetPasswordDto);
     UserDetailDTO getProfile(Long userId);
     UserDetailDTO updateProfile(Long userId, UserDetailDTO userDetailDTO);
+    Long getUserIdByEmail(String email);
 }
