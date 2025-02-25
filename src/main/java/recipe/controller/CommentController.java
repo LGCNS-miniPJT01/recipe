@@ -1,17 +1,30 @@
 package recipe.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import recipe.entity.Comment;
+import recipe.entity.Recipe;
 import recipe.entity.User;
+import recipe.repository.RecipeRepository;
 import recipe.service.CommentService;
+import recipe.service.NotificationService;
 import recipe.service.UserService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -23,6 +36,12 @@ public class CommentController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private RecipeRepository recipeRepository;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     // ✅ 댓글 작성 (userId 직접 입력받음)
     @PostMapping("/{recipeId}")
@@ -34,6 +53,20 @@ public class CommentController {
     ) {
         User user = userService.getUserById(userId);
         Comment comment = commentService.saveComment(recipeId, content, user);
+        
+        // 댓글이 달리 레시피의 작성자에게 알림 전송 - shy
+        Recipe recipe = recipeRepository.findById(recipeId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+        User recipeOwner = recipe.getUser(); // 레시피 작성자
+        
+        // 본인 댓글이 아닐 경우 알림 전송
+        if (!user.equals(recipeOwner)) {
+            String message = user.getUsername() + "님이 당신의 레시피에 댓글을 남겼습니다.";
+
+            // DB에 알림 저장 및 웹소켓 알림 전송
+            notificationService.sendNotification(user, recipeOwner, recipe, message);
+        }
+        
         return ResponseEntity.ok(comment);
     }
 

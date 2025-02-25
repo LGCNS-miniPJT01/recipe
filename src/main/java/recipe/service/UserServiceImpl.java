@@ -1,6 +1,7 @@
 package recipe.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,5 +199,12 @@ public class UserServiceImpl implements UserService{
                 user.getProfileImageUrl(),
                 user.getDescription()
         );
+	}
+
+	@Override
+	public Long getUserIdByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+	    return user.getUserId();
 	}
 }
