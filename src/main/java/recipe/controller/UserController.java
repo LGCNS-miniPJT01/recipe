@@ -23,7 +23,7 @@ import recipe.dto.ResetPasswordDto;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 import recipe.service.AdminService;
-import recipe.service.UserServiceImpl;
+import recipe.service.UserService;
 
 @Slf4j 
 @RestController
@@ -32,7 +32,7 @@ import recipe.service.UserServiceImpl;
 public class UserController {
 	
 	@Autowired
-	private UserServiceImpl userService;
+	private UserService userService;
 	
 	@Autowired
 	private AdminService adminService;

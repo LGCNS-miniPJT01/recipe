@@ -51,4 +51,8 @@ public interface RecipeService {
 	// 카테고리 필터링 후 재료로  검색
 	List<RecipeSearchDto> searchRecipesByCategoryaAnIngredient(String category, String keyword);
 	
+	
+	// 조회수
+	int getRecipeViewCount(Long recipeId);
+	
 }

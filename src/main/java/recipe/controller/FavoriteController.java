@@ -1,18 +1,25 @@
 package recipe.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import recipe.entity.User;
-import recipe.service.FavoriteService;
-import recipe.service.UserServiceImpl;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import recipe.entity.User;
+import recipe.service.FavoriteService;
+import recipe.service.UserService;
 
 @RestController
 @RequestMapping("/api/favorites")
@@ -21,7 +28,7 @@ import java.util.stream.Collectors;
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @PostMapping("/{recipeId}")
     @Operation(summary = "좋아요 추가", description = "레시피에 좋아요를 추가합니다.")
