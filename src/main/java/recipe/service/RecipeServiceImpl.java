@@ -176,6 +176,7 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 
 	// 조회수
+	@Override
 	public int getRecipeViewCount(Long recipeId) {
 		Recipe recipe = recipeRepository.findById(recipeId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
