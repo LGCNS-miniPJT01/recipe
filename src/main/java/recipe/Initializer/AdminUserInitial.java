@@ -1,7 +1,8 @@
-package recipe.config;
+package recipe.Initializer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,8 @@ import recipe.repository.UserRepository;
 // 도커 올릴때 init.sql 내용 추가하고 해당 클래스 삭제 예정
 @Slf4j
 @Component
-public class AdminUserInitialConfig implements CommandLineRunner{
+@Order(1)
+public class AdminUserInitial implements CommandLineRunner{
 	 	@Autowired
 	    private UserRepository userRepository;
 
