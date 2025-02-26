@@ -1,11 +1,14 @@
 package recipe.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
 import recipe.entity.Recipe;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long>{
@@ -58,7 +61,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>{
             "AND LOWER(r.ingredients) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Recipe> searchByCategoryAndIngredients(@Param("category") String category, @Param("keyword") String keyword);
 
-
+    // 관리자 계정으로 게시글이 몇개인지 확인 (user_id = 1)
+    @Query("SELECT COUNT(r) FROM Recipe r WHERE r.user.id = 1")
+    long countRecipesByAdminUser();
+    
+  
+    
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM Recipe r WHERE r.recipeId = :recipeId")
+    Optional<Recipe> findByIdForUpdate(@Param("recipeId") Long recipeId);
     
     
     
