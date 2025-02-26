@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import recipe.dto.RecipeSearchDto;
 import recipe.dto.RecipeSummaryDto;
+import recipe.dto.RecipeTopDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -183,16 +184,18 @@ public class RecipeServiceImpl implements RecipeService {
 		return recipe.getViewCount();
 	}
 
-	@Override
-	//좋아요 수(내림차순)을 기준으로 레시피 받기
-	public List<Recipe> getTopRecipesByFavoriteCount() {
-        List<Object[]> result = favoriteRepository.findTopRecipesByFavoriteCount();
-        
-        // 결과를 Recipe 리스트로 변환
-        return result.stream()
-                     .map(r -> (Recipe) r[0])  // 첫 번째 요소는 Recipe 객체
-                     .collect(Collectors.toList());
-    }
+
+	// 좋아요 수가 많은 상위 3개의 레시피 조회
+	public List<RecipeTopDto> getTopRecipesByFavoriteCount() {
+		// 좋아요 수를 기준으로 상위 3개의 레시피를 조회 (레시피에 좋아요 수가 기록되어 있어야 함)
+		List<Recipe> recipes = recipeRepository.findTop3ByOrderByFavoriteCountDesc();
+
+		// 조회된 레시피들을 RecipeTopDto로 변환
+		return recipes.stream()
+				.map(recipe -> new RecipeTopDto(recipe.getRecipeId(), recipe.getTitle(), recipe.getImageLarge()))
+				.collect(Collectors.toList());
+	}
+
 	// 레서피 제목으로 검색
 	@Override
 	public List<RecipeSearchDto> searchRecipesByTitle(String title) {

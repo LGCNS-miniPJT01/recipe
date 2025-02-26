@@ -97,4 +97,6 @@ public class Recipe {
 
     @Column(nullable = false)
     private int viewCount = 0;
+
+    private int favoriteCount;
 }
