@@ -30,7 +30,7 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
     private final UserService userService;
 
-    @PostMapping("/{recipeId}")
+    @PostMapping("/{id}")
     @Operation(summary = "좋아요 추가", description = "레시피에 좋아요를 추가합니다.")
     public ResponseEntity<Map<String, String>> addFavorite(@PathVariable Long recipeId, @RequestParam Long userId) {
         favoriteService.addFavorite(recipeId, userId);

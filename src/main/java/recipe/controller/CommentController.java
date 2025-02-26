@@ -27,15 +27,15 @@ public class CommentController {
     private UserService userService;
 
     // 댓글 작성 (userId 직접 입력받음)
-    @PostMapping("/{recipeId}")
+    @PostMapping("/{id}")
     @Operation(summary = "댓글 작성", description = "특정 레시피에 댓글을 작성합니다.")
     public ResponseEntity<Comment> addComment(
-            @Parameter(description = "레시피 ID") @PathVariable Long recipeId,
+            @Parameter(description = "레시피 ID") @PathVariable Long id,
             @Parameter(description = "댓글 내용") @RequestParam String content,
             @Parameter(description = "작성자 ID") @RequestParam Long userId
     ) {
         User user = userService.getUserById(userId);
-        Comment comment = commentService.saveComment(recipeId, content, user);
+        Comment comment = commentService.saveComment(id, content, user);
         return ResponseEntity.ok(comment);
     }
 
@@ -65,12 +65,12 @@ public class CommentController {
     }
 
     // 특정 레시피의 댓글 목록 조회 (DTO 변환 추가)
-    @GetMapping("/recipe/{recipeId}")
+    @GetMapping("/recipe/{id}")
     @Operation(summary = "특정 레시피의 댓글 조회", description = "해당 레시피의 모든 댓글을 조회합니다.")
     public ResponseEntity<List<CommentDto>> getCommentsByRecipe(
-            @Parameter(description = "레시피 ID") @PathVariable Long recipeId
+            @Parameter(description = "레시피 ID") @PathVariable Long id
     ) {
-        List<Comment> comments = commentService.getCommentsByRecipe(recipeId);
+        List<Comment> comments = commentService.getCommentsByRecipe(id);
         List<CommentDto> commentDTOs = comments.stream()
                 .map(CommentDto::fromEntity)
                 .collect(Collectors.toList());

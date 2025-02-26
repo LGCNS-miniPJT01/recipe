@@ -33,10 +33,10 @@ public class ReportController {
 	private UserService userService;
 	
 	//레시피 신고
-    @PostMapping("/{recipeId}")
+    @PostMapping("/{id}")
     @Operation(summary = "레시피 신고", description = "일반 사용자의 레시피 신고 기능")
-    public ResponseEntity<String> reportPost(@PathVariable Long recipeId, @RequestParam String reason) {
-        reportService.reportRecipe(recipeId, reason);
+    public ResponseEntity<String> reportPost(@PathVariable Long id, @RequestParam String reason) {
+        reportService.reportRecipe(id, reason);
         return ResponseEntity.ok("신고가 접수되었습니다.");
     }
     
