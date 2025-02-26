@@ -29,7 +29,11 @@ public interface RecipeService {
 	// 리시피 아이디로 레시피 조회
 	Optional<Recipe> getRecipeById(Long recipeId);
 
+	//레시피의 조회수 확인
 	Recipe getRecipeByIdWithViewCount(Long recipeId);
+	
+	//좋아요 수(내림차순)으로 레시피 조회
+	List<Recipe> getTopRecipesByFavoriteCount();
 	
 	// 레시피 검색 기능 제목,재료
 	List<RecipeSearchDto> searchRecipesByTitle(String title);
@@ -46,5 +50,9 @@ public interface RecipeService {
 	
 	// 카테고리 필터링 후 재료로  검색
 	List<RecipeSearchDto> searchRecipesByCategoryaAnIngredient(String category, String keyword);
+	
+	
+	// 조회수
+	int getRecipeViewCount(Long recipeId);
 	
 }

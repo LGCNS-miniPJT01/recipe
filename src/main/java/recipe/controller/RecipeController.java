@@ -31,7 +31,9 @@ import recipe.dto.RecipeWithStepsDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
+import recipe.service.RecipeService;
 import recipe.service.RecipeServiceImpl;
+import recipe.service.UserService;
 import recipe.service.UserServiceImpl;
 
 @RestController
@@ -39,8 +41,8 @@ import recipe.service.UserServiceImpl;
 @Tag(name = "Recipe API", description = "레시피 관련 API 목록")
 public class RecipeController {
 
-    private final RecipeServiceImpl recipeService;
-    private final UserServiceImpl userService;
+    private final RecipeService recipeService;
+    private final UserService userService;
 
     public RecipeController(RecipeServiceImpl recipeService, UserServiceImpl userService) {
         this.recipeService = recipeService;
@@ -161,4 +163,10 @@ public class RecipeController {
         return ResponseEntity.ok(viewCount);
     }
 
+    // 좋아요 수가 높은 순서대로 레시피 목록 조회
+    @GetMapping("/topliked")
+    public ResponseEntity<List<Recipe>> getTopLikedRecipes() {
+        List<Recipe> topRecipes = recipeService.getTopRecipesByFavoriteCount();
+        return ResponseEntity.ok(topRecipes);
+    }
 }

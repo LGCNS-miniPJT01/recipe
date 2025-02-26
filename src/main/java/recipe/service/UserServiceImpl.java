@@ -1,6 +1,7 @@
 package recipe.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import recipe.dto.FindEmailRequestDto;
 import recipe.dto.FindPasswordRequestDto;
 import recipe.dto.LoginRequestDto;
 import recipe.dto.ResetPasswordDto;
+import recipe.dto.UserDetailDTO;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 import recipe.entity.UserRole;
@@ -155,5 +157,54 @@ public class UserServiceImpl implements UserService{
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 		
+	}
+
+	// 프로필 조회 
+	@Override
+	public UserDetailDTO getProfile(Long userId) {
+		User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        return new UserDetailDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getProfileImageUrl(),
+                user.getDescription()
+        );
+	}
+
+	// 프로필 수정
+	@Override
+	@Transactional
+	public UserDetailDTO updateProfile(Long userId, UserDetailDTO userDetailDTO) {
+		User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        // 변경할 값 적용
+		if(userDetailDTO.getPhone() != null) {
+			user.setPhone(userDetailDTO.getPhone());
+		}
+        if (userDetailDTO.getProfileImageUrl() != null) {
+            user.setProfileImageUrl(userDetailDTO.getProfileImageUrl());
+        }
+        if (userDetailDTO.getDescription() != null) {
+            user.setDescription(userDetailDTO.getDescription());
+        }
+
+        return new UserDetailDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getProfileImageUrl(),
+                user.getDescription()
+        );
+	}
+
+	@Override
+	public Long getUserIdByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+	    return user.getUserId();
 	}
 }

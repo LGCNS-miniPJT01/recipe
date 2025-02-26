@@ -17,6 +17,7 @@ import recipe.dto.RecipeSummaryDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
+import recipe.repository.FavoriteRepository;
 import recipe.repository.RecipeRepository;
 import recipe.repository.RecipeStepRepository;
 
@@ -29,6 +30,9 @@ public class RecipeServiceImpl implements RecipeService {
 	@Autowired
 	private RecipeStepRepository recipeStepRepository;
 	
+	@Autowired
+	private FavoriteRepository favoriteRepository;
+
 	@Autowired
 	private  ModelMapper modelMapper;
 
@@ -172,12 +176,23 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 
 	// 조회수
+	@Override
 	public int getRecipeViewCount(Long recipeId) {
 		Recipe recipe = recipeRepository.findById(recipeId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
 		return recipe.getViewCount();
 	}
 
+	@Override
+	//좋아요 수(내림차순)을 기준으로 레시피 받기
+	public List<Recipe> getTopRecipesByFavoriteCount() {
+        List<Object[]> result = favoriteRepository.findTopRecipesByFavoriteCount();
+        
+        // 결과를 Recipe 리스트로 변환
+        return result.stream()
+                     .map(r -> (Recipe) r[0])  // 첫 번째 요소는 Recipe 객체
+                     .collect(Collectors.toList());
+    }
 	// 레서피 제목으로 검색
 	@Override
 	public List<RecipeSearchDto> searchRecipesByTitle(String title) {
@@ -234,5 +249,4 @@ public class RecipeServiceImpl implements RecipeService {
 	                .collect(Collectors.toList());
 	}
 	
-
 }

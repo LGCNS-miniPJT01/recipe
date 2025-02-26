@@ -11,34 +11,27 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
-	@Bean
+    
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
-	@Bean
+    
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(
-                    "/swagger-ui/**", 
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**", 
-                    "/webjars/**",
-                    // 나중에 비로그인 사용자 기능을 추가하려면 아래 url 추가 
-                    "/api/users/register",  // 회원가입
-                    "/api/users/login", // 로그인
-                    "/api/users/**," +
-                    "/api/recipe/**",
-                    "api/comments/**",
-                    "/api/recipesearch/**" // 검색기능 (비로그인 회원 가능)
-               ).permitAll()  // Swagger 경로는 인증 없이 접근 가능
-                .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
-            )
-            .csrf(csrf -> csrf.disable());  // 🚨 CSRF 보호 비활성화 (테스트 환경에서만)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers( // ✅ 로그인 없이 접근 가능한 경로 설정
+                    "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", // Swagger 허용
+                    "/api/users/register", "/api/users/login", // 회원가입 및 로그인 허용
+                    "/api/recipes/**", "/api/comments/**", "/api/recipesearch/**", // 검색, 레시피 접근 허용
+                    "/ws/**" , "/topic/**", "/queue/**"// WebSocket & 정적 파일 허용
+                ).permitAll()
+                .anyRequest().authenticated()) 
+            	.csrf(csrf -> csrf.disable()) // ✅ CSRF 보호 비활성화 (WebSocket 사용 시 필수)
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // X-Frame-Options 문제 해결
+
 
         return http.build();
     }
-
 }

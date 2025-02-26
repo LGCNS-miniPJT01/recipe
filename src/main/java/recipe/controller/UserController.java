@@ -19,11 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import recipe.dto.FindEmailRequestDto;
 import recipe.dto.FindPasswordRequestDto;
 import recipe.dto.LoginRequestDto;
+import recipe.dto.LoginResponseDto;
 import recipe.dto.ResetPasswordDto;
 import recipe.dto.UserRegisterDto;
 import recipe.entity.User;
 import recipe.service.AdminService;
-import recipe.service.UserServiceImpl;
+import recipe.service.UserService;
 
 @Slf4j 
 @RestController
@@ -32,7 +33,7 @@ import recipe.service.UserServiceImpl;
 public class UserController {
 	
 	@Autowired
-	private UserServiceImpl userService;
+	private UserService userService;
 	
 	@Autowired
 	private AdminService adminService;
@@ -49,11 +50,12 @@ public class UserController {
 	// 로그인
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 기능")
-    public ResponseEntity<String> login(@RequestBody @Validated LoginRequestDto loginRequestDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Validated LoginRequestDto loginRequestDto) {
 		log.info("📍[로그인 요청] email: {}, PW: {}", loginRequestDto.getEmail(), loginRequestDto.getPassword());
         String token = userService.login(loginRequestDto);
+        Long userId = userService.getUserIdByEmail(loginRequestDto.getEmail()); // userId 가져오기
         log.info("✅ [로그인  완료] email: {}", loginRequestDto.getEmail());
-        return ResponseEntity.ok(token); // JWT 토큰 반환
+        return ResponseEntity.ok(new LoginResponseDto(userId, token)); // JWT 토큰 반환
     }
     
     // 이메일 찾기
