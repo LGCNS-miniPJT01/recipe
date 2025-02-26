@@ -24,10 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import recipe.dto.RecipeDetailDto;
-import recipe.dto.RecipeStepDto;
-import recipe.dto.RecipeSummaryDto;
-import recipe.dto.RecipeWithStepsDto;
+import recipe.dto.*;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -163,10 +160,11 @@ public class RecipeController {
         return ResponseEntity.ok(viewCount);
     }
 
-    // 좋아요 수가 높은 순서대로 레시피 목록 조회
+    // 좋아요 수가 많은 상위 3개의 레시피를 조회하여 반환
     @GetMapping("/topliked")
-    public ResponseEntity<List<Recipe>> getTopLikedRecipes() {
-        List<Recipe> topRecipes = recipeService.getTopRecipesByFavoriteCount();
-        return ResponseEntity.ok(topRecipes);
+    public ResponseEntity<List<RecipeTopDto>> getTopLikedRecipes() {
+        // 상위 3개의 레시피를 조회
+        List<RecipeTopDto> topRecipes = recipeService.getTopRecipesByFavoriteCount();
+        return ResponseEntity.ok(topRecipes); // 성공적인 응답 반환
     }
 }
