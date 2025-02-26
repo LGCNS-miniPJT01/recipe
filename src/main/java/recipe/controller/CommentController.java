@@ -6,12 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import recipe.dto.CommentDto;
 import recipe.entity.Comment;
 import recipe.entity.User;
 import recipe.service.CommentService;
 import recipe.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -24,7 +26,7 @@ public class CommentController {
     @Autowired
     private UserService userService;
 
-    // ✅ 댓글 작성 (userId 직접 입력받음)
+    // 댓글 작성 (userId 직접 입력받음)
     @PostMapping("/{recipeId}")
     @Operation(summary = "댓글 작성", description = "특정 레시피에 댓글을 작성합니다.")
     public ResponseEntity<Comment> addComment(
@@ -37,7 +39,7 @@ public class CommentController {
         return ResponseEntity.ok(comment);
     }
 
-    // ✅ 댓글 수정 (userId 직접 입력받음)
+    // 댓글 수정 (userId 직접 입력받음)
     @PutMapping("/{commentId}")
     @Operation(summary = "댓글 수정", description = "작성한 댓글을 수정합니다.")
     public ResponseEntity<Comment> updateComment(
@@ -50,7 +52,7 @@ public class CommentController {
         return ResponseEntity.ok(updatedComment);
     }
 
-    // ✅ 댓글 삭제 (userId 직접 입력받음)
+    // 댓글 삭제 (userId 직접 입력받음)
     @DeleteMapping("/{commentId}")
     @Operation(summary = "댓글 삭제", description = "작성한 댓글을 논리 삭제합니다.")
     public ResponseEntity<Void> deleteComment(
@@ -62,20 +64,23 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ 특정 레시피의 댓글 목록 조회
+    // 특정 레시피의 댓글 목록 조회 (DTO 변환 추가)
     @GetMapping("/recipe/{recipeId}")
     @Operation(summary = "특정 레시피의 댓글 조회", description = "해당 레시피의 모든 댓글을 조회합니다.")
-    public ResponseEntity<List<Comment>> getCommentsByRecipe(
+    public ResponseEntity<List<CommentDto>> getCommentsByRecipe(
             @Parameter(description = "레시피 ID") @PathVariable Long recipeId
     ) {
         List<Comment> comments = commentService.getCommentsByRecipe(recipeId);
-        return ResponseEntity.ok(comments);
+        List<CommentDto> commentDTOs = comments.stream()
+                .map(CommentDto::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(commentDTOs);
     }
 
-    // ✅ 관리자 전체 댓글 조회 (userId 직접 입력받음)
+    // 관리자 전체 댓글 조회 (DTO 변환 추가)
     @GetMapping("/admin/all")
     @Operation(summary = "관리자 댓글 전체 조회", description = "관리자가 모든 댓글을 조회할 수 있습니다.")
-    public ResponseEntity<List<Comment>> getAllCommentsForAdmin(
+    public ResponseEntity<List<CommentDto>> getAllCommentsForAdmin(
             @Parameter(description = "관리자 ID") @RequestParam Long userId
     ) {
         User user = userService.getUserById(userId);
@@ -83,6 +88,9 @@ public class CommentController {
             return ResponseEntity.status(403).build();
         }
         List<Comment> comments = commentService.getAllCommentsForAdmin();
-        return ResponseEntity.ok(comments);
+        List<CommentDto> commentDTOs = comments.stream()
+                .map(CommentDto::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(commentDTOs);
     }
 }
