@@ -15,7 +15,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     int countByRecipe(Recipe recipe);
     List<Favorite> findByRecipe(Recipe recipe);
     
-    @Query("SELECT f.recipe, COUNT(f) AS favoriteCount " +
+    @Query("SELECT DISTINCT f.recipe, COUNT(f) AS favoriteCount " +
             "FROM Favorite f " +
             "GROUP BY f.recipe " +
             "ORDER BY favoriteCount DESC")
