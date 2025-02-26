@@ -92,18 +92,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        log.debug("shouldNotFilter >>>>>>>>>>");
-        
-        String[] excludePath = { "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", // Swagger 허용
-                "/api/users/register", "/api/users/login", // 회원가입 및 로그인 허용
-                "/api/recipes/**", "/api/comments/**", "/api/recipesearch/**", // 검색, 레시피 접근 허용
-                "/ws/**" , "/topic/**", "/queue/**" } ;// WebSocket & 정적 파일 허용}; 
-       
-        
-        String uri = request.getRequestURI();
-        boolean result = Arrays.stream(excludePath).anyMatch(uri::startsWith);
-        log.debug(">>>" + result);
-        
-        return result;
+//        log.debug("shouldNotFilter >>>>>>>>>>");
+//
+//        
+//        String[] excludePath = { 
+//                "/swagger-ui", "/swagger-ui/", "/swagger-ui/**",
+//                "/v3/api-docs", "/v3/api-docs/**",
+//                "/swagger-resources", "/swagger-resources/**",
+//                "/webjars", "/webjars/**",
+//                "/api/**",
+//                "/ws/**" , "/topic/**", "/queue/**"
+//            };
+//       
+//        
+//        String uri = request.getRequestURI();
+//        boolean result = Arrays.stream(excludePath).anyMatch(uri::startsWith);
+//        log.debug(">>>" + result);
+//        
+        return true;
     }
 }
