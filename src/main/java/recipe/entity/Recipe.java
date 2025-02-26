@@ -75,7 +75,7 @@ public class Recipe {
     @Column(nullable = false, length = 255)
     private String imageLarge;
     
-    @Column(nullable = false, length = 255)
+    @Column(columnDefinition = "TEXT") // 🔥 VARCHAR(255) → TEXT로 변경
     private String ingredients;
     
     @Column(columnDefinition = "TEXT")
@@ -97,4 +97,6 @@ public class Recipe {
 
     @Column(nullable = false)
     private int viewCount = 0;
+
+    private int favoriteCount;
 }

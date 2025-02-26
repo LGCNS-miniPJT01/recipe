@@ -24,10 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import recipe.dto.RecipeDetailDto;
-import recipe.dto.RecipeStepDto;
-import recipe.dto.RecipeSummaryDto;
-import recipe.dto.RecipeWithStepsDto;
+import recipe.dto.*;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -60,10 +57,10 @@ public class RecipeController {
         return recipeService.saveRecipe(recipeWithStepsDTO.getRecipe(), user);
     }
 
-    @PutMapping("/recipes/{recipeId}")
+    @PutMapping("/recipes/{id}")
     @Operation(summary = "레시피 수정", description = "기존 레시피를 수정합니다. 사용자의 ID와 함께 수정할 내용을 전달합니다.")
     public ResponseEntity<Recipe> updateRecipe(
-            @PathVariable Long recipeId,
+            @PathVariable Long id,
             @RequestParam Long userId,
             @RequestBody Map<String, Object> request) {
 
@@ -75,15 +72,15 @@ public class RecipeController {
         List<RecipeSteps> steps = objectMapper.convertValue(request.get("recipeSteps"),
                 new TypeReference<List<RecipeSteps>>() {});
 
-        Recipe savedRecipe = recipeService.updateRecipe(recipeId, updatedRecipe, user, steps);
+        Recipe savedRecipe = recipeService.updateRecipe(id, updatedRecipe, user, steps);
         return ResponseEntity.ok(savedRecipe);
     }
 
-    @DeleteMapping("/{recipeId}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "레시피 삭제", description = "레시피를 삭제합니다. 사용자가 본인의 레시피만 삭제할 수 있으며, 관리자는 모든 레시피를 삭제할 수 있습니다.")
-    public String deleteRecipe(@PathVariable Long recipeId, @RequestParam Long userId) {
+    public String deleteRecipe(@PathVariable Long id, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
-        recipeService.softDeleteRecipe(recipeId, user);
+        recipeService.softDeleteRecipe(id, user);
         return "레시피가 삭제되었습니다.";
     }
 
@@ -107,15 +104,15 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
-    @GetMapping("/{recipeId}")
+    @GetMapping("/{id}")
     @Operation(summary = "레시피 상세 조회", description = "레시피의 상세 정보를 조회하며 조회수를 증가시킵니다.")
-    public RecipeDetailDto getRecipeDetail(@PathVariable Long recipeId, @RequestParam Long userId) {
+    public RecipeDetailDto getRecipeDetail(@PathVariable Long id, @RequestParam Long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        Recipe recipe = recipeService.getRecipeByIdWithViewCount(recipeId);
+        Recipe recipe = recipeService.getRecipeByIdWithViewCount(id);
 
         if (recipe.isDeletedYn() && !user.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe has been deleted");
@@ -128,7 +125,7 @@ public class RecipeController {
 
     public RecipeDetailDto convertToRecipeDetailDto(Recipe recipe) {
         RecipeDetailDto dto = new RecipeDetailDto();
-        dto.setRecipeId(recipe.getRecipeId());
+        dto.setRecipeId(recipe.getId());
         dto.setTitle(recipe.getTitle());
         dto.setCookingMethod(recipe.getCookingMethod());
         dto.setCategory(recipe.getCategory());
@@ -156,17 +153,18 @@ public class RecipeController {
         return dto;
     }
 
-    @GetMapping("/{recipeId}/views")
+    @GetMapping("/{id}/views")
     @Operation(summary = "레시피 조회수 확인", description = "특정 레시피의 조회수를 반환합니다.")
-    public ResponseEntity<Integer> getRecipeViewCount(@PathVariable Long recipeId) {
-        int viewCount = recipeService.getRecipeViewCount(recipeId);
+    public ResponseEntity<Integer> getRecipeViewCount(@PathVariable Long id) {
+        int viewCount = recipeService.getRecipeViewCount(id);
         return ResponseEntity.ok(viewCount);
     }
 
-    // 좋아요 수가 높은 순서대로 레시피 목록 조회
+    // 좋아요 수가 많은 상위 3개의 레시피를 조회하여 반환
     @GetMapping("/topliked")
-    public ResponseEntity<List<Recipe>> getTopLikedRecipes() {
-        List<Recipe> topRecipes = recipeService.getTopRecipesByFavoriteCount();
-        return ResponseEntity.ok(topRecipes);
+    public ResponseEntity<List<RecipeTopDto>> getTopLikedRecipes() {
+        // 상위 3개의 레시피를 조회
+        List<RecipeTopDto> topRecipes = recipeService.getTopRecipesByFavoriteCount();
+        return ResponseEntity.ok(topRecipes); // 성공적인 응답 반환
     }
 }

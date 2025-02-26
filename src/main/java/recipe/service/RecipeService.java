@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import recipe.dto.RecipeSearchDto;
 import recipe.dto.RecipeSummaryDto;
+import recipe.dto.RecipeTopDto;
 import recipe.entity.Recipe;
 import recipe.entity.RecipeSteps;
 import recipe.entity.User;
@@ -31,10 +32,9 @@ public interface RecipeService {
 
 	//레시피의 조회수 확인
 	Recipe getRecipeByIdWithViewCount(Long recipeId);
-	
-	//좋아요 수(내림차순)으로 레시피 조회
-	List<Recipe> getTopRecipesByFavoriteCount();
-	
+
+	List<RecipeTopDto> getTopRecipesByFavoriteCount();
+
 	// 레시피 검색 기능 제목,재료
 	List<RecipeSearchDto> searchRecipesByTitle(String title);
 	List<RecipeSearchDto> searchRecipesByIngredient(String ingredient);

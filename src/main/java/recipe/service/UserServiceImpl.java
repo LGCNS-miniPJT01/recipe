@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService{
         }
 
         String roleString = user.getRole().toString();
-        return jwtUtil.createJwt(user.getEmail(), roleString, 3600000L); // 1시간짜리 JWT 생성
+        return jwtUtil.generateToken(user); // 1시간짜리 JWT 생성
     }
 
 	// 이메일 찾기 
